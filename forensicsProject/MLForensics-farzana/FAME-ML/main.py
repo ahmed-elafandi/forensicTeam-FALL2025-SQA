@@ -1,27 +1,30 @@
-'''
-Farzana Ahamed Bhuiyan (Lead) 
-Akond Rahman 
-Oct 20, 2020 
-Main executor 
-'''
+"""
+Farzana Ahamed Bhuiyan (Lead)
+Akond Rahman
+Oct 20, 2020
+Main executor
+"""
+
 import lint_engine
-import constants 
-import time 
-import datetime 
-import os 
+import constants
+import time
+import datetime
+import os
 import pandas as pd
-import py_parser 
-import numpy as np 
+import py_parser
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 def giveTimeStamp():
-  tsObj = time.time()
-  strToret = datetime.datetime.fromtimestamp(tsObj).strftime(constants.TIME_FORMAT) 
-  return strToret
-  
+    tsObj = time.time()
+    strToret = datetime.datetime.fromtimestamp(tsObj).strftime(
+        constants.TIME_FORMAT
+    )
+    return strToret
+
 
 def getCSVData(dic_, dir_repo):
     """
@@ -33,14 +36,14 @@ def getCSVData(dic_, dir_repo):
     """
     logger.info(
         "getCSVData called",
-        extra={"dir_repo": dir_repo, "num_scripts": len(dic_)}
+        extra={"dir_repo": dir_repo, "num_scripts": len(dic_)},
     )
 
     temp_list = []
     for TEST_ML_SCRIPT in dic_:
         logger.info(
             "Analyzing ML script in getCSVData",
-            extra={"script": TEST_ML_SCRIPT}
+            extra={"script": TEST_ML_SCRIPT},
         )
 
         # Section 1.1a
@@ -160,49 +163,54 @@ def getCSVData(dic_, dir_repo):
     )
     return temp_list
 
-  
+
 def getAllPythonFilesinRepo(path2dir):
-	valid_list = []
-	for root_, dirnames, filenames in os.walk(path2dir):
-		for file_ in filenames:
-			full_path_file = os.path.join(root_, file_) 
-			if( os.path.exists( full_path_file ) ):
-				if (file_.endswith( constants.PY_FILE_EXTENSION ) and (py_parser.checkIfParsablePython( full_path_file ) )   ):
-					valid_list.append(full_path_file) 
-	valid_list = np.unique(  valid_list )
-	return valid_list
+    valid_list = []
+    for root_, dirnames, filenames in os.walk(path2dir):
+        for file_ in filenames:
+            full_path_file = os.path.join(root_, file_)
+            if os.path.exists(full_path_file):
+                if file_.endswith(constants.PY_FILE_EXTENSION) and (
+                    py_parser.checkIfParsablePython(full_path_file)
+                ):
+                    valid_list.append(full_path_file)
+    valid_list = np.unique(valid_list)
+    return valid_list
 
 
 def runFameML(inp_dir, csv_fil):
-	output_event_dict = {}
-	df_list = [] 
-	list_subfolders_with_paths = [f.path for f in os.scandir(inp_dir) if f.is_dir()]
-	for subfolder in list_subfolders_with_paths: 
-		events_with_dic =  getAllPythonFilesinRepo(subfolder)  
-		if subfolder not in output_event_dict:
-			output_event_dict[subfolder] = events_with_dic
-		temp_list  = getCSVData(events_with_dic, subfolder)
-		df_list    = df_list + temp_list 
-		print(constants.ANALYZING_KW, subfolder)
-		print('-'*50)
-	full_df = pd.DataFrame( df_list ) 
-	# print(full_df.head())
-	full_df.to_csv(csv_fil, header= constants.CSV_HEADER, index=False, encoding= constants.UTF_ENCODING)     
-	return output_event_dict
+    output_event_dict = {}
+    df_list = []
+    list_subfolders_with_paths = [
+        f.path for f in os.scandir(inp_dir) if f.is_dir()
+    ]
+    for subfolder in list_subfolders_with_paths:
+        events_with_dic = getAllPythonFilesinRepo(subfolder)
+        if subfolder not in output_event_dict:
+            output_event_dict[subfolder] = events_with_dic
+        temp_list = getCSVData(events_with_dic, subfolder)
+        df_list = df_list + temp_list
+        print(constants.ANALYZING_KW, subfolder)
+        print("-" * 50)
+    full_df = pd.DataFrame(df_list)
+    # print(full_df.head())
+    full_df.to_csv(
+        csv_fil,
+        header=constants.CSV_HEADER,
+        index=False,
+        encoding=constants.UTF_ENCODING,
+    )
+    return output_event_dict
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # ------------- Forensics Logging Setup -----------------
-    import logging
-    import time
-    import os
-
     logging.basicConfig(
-        filename='forensics.log',
-        filemode='a',
+        filename="forensics.log",
+        filemode="a",
         level=logging.INFO,
-        format='%(asctime)s [%(levelname)s] %(name)s:%(lineno)d %(message)s',
+        format="%(asctime)s [%(levelname)s] %(name)s:%(lineno)d %(message)s",
     )
 
     logger = logging.getLogger(__name__)
@@ -212,8 +220,8 @@ if __name__ == '__main__':
     command_line_flag = False  # after acceptance
 
     t1 = time.time()
-    print('Started at:', giveTimeStamp())
-    print('*' * 100)
+    print("Started at:", giveTimeStamp())
+    print("*" * 100)
 
     if command_line_flag:
         dir_path = input(constants.ASK_INPUT_FROM_USER)
@@ -221,35 +229,42 @@ if __name__ == '__main__':
 
         if os.path.exists(dir_path):
             repo_dir = dir_path
-            output_file = dir_path.split('/')[-2]
-            output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_' + output_file + '.csv'
+            output_file = dir_path.split("/")[-2]
+            output_csv = (
+                "/Users/arahman/Documents/OneDriveWingUp/"
+                "OneDrive-TennesseeTechUniversity/Research/"
+                "VulnStrategyMining/ForensicsinML/Output/V5_"
+                + output_file
+                + ".csv"
+            )
             full_dict = runFameML(repo_dir, output_csv)
-
     else:
-        repo_dir = '/Users/arahman/FSE2021_ML_REPOS/GITHUB_REPOS/'
-        output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_GITHUB.csv'
+        repo_dir = "/Users/arahman/FSE2021_ML_REPOS/GITHUB_REPOS/"
+        output_csv = (
+            "/Users/arahman/Documents/OneDriveWingUp/"
+            "OneDrive-TennesseeTechUniversity/Research/"
+            "VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_GITHUB.csv"
+        )
         full_dict = runFameML(repo_dir, output_csv)
 
+    # Alternative repo/output examples from original code (left as comments):
+    # repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/GITLAB_REPOS/'
+    # output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_GITLAB.csv'
+    # full_dict  = runFameML(repo_dir, output_csv)
+    #
+    # repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/MODELZOO/'
+    # output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_MODELZOO.csv'
+    # full_dict  = runFameML(repo_dir, output_csv)
+    #
+    # repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/TEST/'
+    # output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_TEST.csv'
+    # full_dict  = runFameML(repo_dir, output_csv)
 
-		# repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/GITLAB_REPOS/'
-		# output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_GITLAB.csv'
-		# full_dict  = runFameML(repo_dir, output_csv)
+    print("*" * 100)
+    print("Ended at:", giveTimeStamp())
+    print("*" * 100)
 
-		# repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/MODELZOO/'
-		# output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_MODELZOO.csv'
-		# full_dict  = runFameML(repo_dir, output_csv)
-		
-		# repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/TEST/'
-		# output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_TEST.csv'
-		# full_dict = runFameML(repo_dir, output_csv)
-
-	print('*'*100 )
-	print('Ended at:', giveTimeStamp() )
-	print('*'*100 )
-	
-	t2 = time.time()
-	time_diff = round( (t2 - t1 ) / 60, 5) 
-	print('Duration: {} minutes'.format(time_diff) )
-	print('*'*100 )
-
-
+    t2 = time.time()
+    time_diff = round((t2 - t1) / 60, 5)
+    print("Duration: {} minutes".format(time_diff))
+    print("*" * 100)
