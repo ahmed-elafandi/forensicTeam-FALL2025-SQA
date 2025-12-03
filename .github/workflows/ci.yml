@@ -13,7 +13,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: forensicsProject/MLForensics-farzana
+        working-directory: forensicsProject
 
     steps:
       - name: Checkout repository
