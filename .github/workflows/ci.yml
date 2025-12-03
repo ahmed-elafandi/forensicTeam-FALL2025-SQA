@@ -5,15 +5,11 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   fuzz-and-log:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: forensicsProject
 
     steps:
       - name: Checkout repository
@@ -24,11 +20,14 @@ jobs:
         with:
           python-version: '3.11'
 
+      # Run fuzz.py from the same folder you use locally:
+      # forensicsProject/fuzz.py
       - name: Run fuzzing (fuzz.py)
-        run: |
-          python fuzz.py
+        working-directory: forensicsProject
+        run: python fuzz.py
 
       - name: Show fuzz_crashes.log (if it exists)
+        working-directory: forensicsProject
         run: |
           if [ -f fuzz_crashes.log ]; then
             echo "=== fuzz_crashes.log ==="
