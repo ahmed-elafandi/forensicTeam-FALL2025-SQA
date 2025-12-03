@@ -1,0 +1,38 @@
+name: MLForensics CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: 
+
+jobs:
+  fuzz-and-log:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: forensicsProject/MLForensics-farzana
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run fuzzing (fuzz.py)
+        run: |
+          python fuzz.py
+
+      - name: Show fuzz_crashes.log (if it exists)
+        run: |
+          if [ -f fuzz_crashes.log ]; then
+            echo "=== fuzz_crashes.log ==="
+            cat fuzz_crashes.log
+          else
+            echo "No fuzz_crashes.log file found."
+          fi
