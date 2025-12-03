@@ -191,9 +191,12 @@ def runFameML(inp_dir, csv_fil):
 	return output_event_dict
 
 
-if __name__=='__main__':
-	    # ----------------- Forensics Logging Setup -----------------
+if __name__ == '__main__':
+
+    # ------------- Forensics Logging Setup -----------------
     import logging
+    import time
+    import os
 
     logging.basicConfig(
         filename='forensics.log',
@@ -204,26 +207,29 @@ if __name__=='__main__':
 
     logger = logging.getLogger(__name__)
     logger.info("MLForensics script started")
-    # ------------------------------------------------------------
+    # -------------------------------------------------------
 
-	command_line_flag = False ## after acceptance   
+    command_line_flag = False  # after acceptance
 
-	t1 = time.time()
-	print('Started at:', giveTimeStamp() )
-	print('*'*100 )
+    t1 = time.time()
+    print('Started at:', giveTimeStamp())
+    print('*' * 100)
 
-	if command_line_flag:
-		dir_path = input(constants.ASK_INPUT_FROM_USER)   
-		dir_path = dir_path.strip() 
-		if(os.path.exists( dir_path ) ):
-			repo_dir    = dir_path 
-			output_file = dir_path.split('/')[-2]
-			output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_' + output_file + '.csv'
-			full_dict  = runFameML(repo_dir, output_csv)
-	else: 
-		repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/GITHUB_REPOS/'
-		output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_GITHUB.csv'
-		full_dict  = runFameML(repo_dir, output_csv)
+    if command_line_flag:
+        dir_path = input(constants.ASK_INPUT_FROM_USER)
+        dir_path = dir_path.strip()
+
+        if os.path.exists(dir_path):
+            repo_dir = dir_path
+            output_file = dir_path.split('/')[-2]
+            output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_' + output_file + '.csv'
+            full_dict = runFameML(repo_dir, output_csv)
+
+    else:
+        repo_dir = '/Users/arahman/FSE2021_ML_REPOS/GITHUB_REPOS/'
+        output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_GITHUB.csv'
+        full_dict = runFameML(repo_dir, output_csv)
+
 
 		# repo_dir   = '/Users/arahman/FSE2021_ML_REPOS/GITLAB_REPOS/'
 		# output_csv = '/Users/arahman/Documents/OneDriveWingUp/OneDrive-TennesseeTechUniversity/Research/VulnStrategyMining/ForensicsinML/Output/V5_OUTPUT_GITLAB.csv'
